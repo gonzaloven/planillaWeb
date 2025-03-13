@@ -83,6 +83,16 @@
         font-size: 1.2em;
       }
 
+      /* Login container styles */
+      .login-container {
+        max-width: 400px;
+        margin: auto;
+        background-color: #252525;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      }
+
       /* Responsive Design */
       @media (max-width: 600px) {
         h2, h3 {
@@ -109,7 +119,18 @@
     </style>
   </head>
   <body>
-    <div class="container">
+    <!-- Login section - will be hidden once authenticated -->
+    <div id="loginSection" class="login-container">
+      <h2>Iniciar Sesión</h2>
+      <input type="text" id="username" placeholder="Usuario" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      <button id="loginButton" onclick="login()">Acceder</button>
+      <!-- Login feedback message -->
+      <div id="loginFeedback" class="feedback-message"></div>
+    </div>
+
+    <!-- App content - will be shown only after authentication -->
+    <div id="appContent" class="container" style="display: none;">
       <h2>Mis Finanzas</h2>
       <p><span class="price-label">Precio del Dólar:</span> <span id="dolar">Cargando...</span></p>
       <p><span class="price-label">Balance Total:</span> <span id="balance">Cargando...</span></p>
@@ -124,6 +145,81 @@
 
     <script>
       const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; 
+      let credentials = {
+        username: '',
+        password: ''
+      };
+      
+      // Check if user is already logged in from previous session
+      window.onload = function() {
+        const savedUsername = localStorage.getItem('username');
+        const savedPassword = localStorage.getItem('password');
+        
+        if (savedUsername && savedPassword) {
+          credentials.username = savedUsername;
+          credentials.password = savedPassword;
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('appContent').style.display = 'block';
+          cargarDatos();
+        }
+      };
+
+      // Login function
+      async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+          showLoginFeedback("Por favor, ingresa usuario y contraseña", "error");
+          return;
+        }
+        
+        credentials.username = username;
+        credentials.password = password;
+        
+        try {
+          // Test authentication with a simple GET request
+          let response = await fetch(SHEET_API_URL + "?action=getData&username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password), {
+            method: "GET",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            }
+          });
+          
+          if (response.ok) {
+            // Save credentials to localStorage for persistence
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+            
+            // Hide login, show app
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            
+            // Load app data
+            cargarDatos();
+          } else {
+            showLoginFeedback("Usuario o contraseña incorrectos", "error");
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+          }
+        } catch (error) {
+          console.error("Error de autenticación", error);
+          showLoginFeedback("Error de conexión", "error");
+        }
+      }
+
+      // Login feedback
+      function showLoginFeedback(message, type) {
+        const feedback = document.getElementById("loginFeedback");
+        feedback.textContent = message;
+        feedback.style.display = "block";
+        feedback.style.backgroundColor = (type === "success") ? "#4CAF50" : "#f44336";
+        
+        setTimeout(() => {
+          feedback.style.display = "none";
+        }, 3000);
+      }
 
       // Format number to the style 55.359.101,32
       function formatNumber(number) {
@@ -132,13 +228,25 @@
 
       async function cargarDatos() {
         try {
-          let response = await fetch(SHEET_API_URL + "?action=getData", {
+          const url = SHEET_API_URL + "?action=getData&username=" + encodeURIComponent(credentials.username) + "&password=" + encodeURIComponent(credentials.password);
+          let response = await fetch(url, {
             method: "GET",
             redirect: "follow",
             headers: {
               "Content-Type": "text/plain;charset=utf-8"
             }
           });
+          
+          // Check if unauthorized
+          if (response.status === 401) {
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('appContent').style.display = 'none';
+            showLoginFeedback("Sesión expirada, inicia sesión nuevamente", "error");
+            return;
+          }
+          
           let resultText = await response.text();
           let data = JSON.parse(resultText);
 
@@ -146,6 +254,7 @@
           document.getElementById("balance").textContent = "$" + formatNumber(data.balance);
 
           let categoriaSelect = document.getElementById("categoria");
+          categoriaSelect.innerHTML = ''; // Clear existing options
           data.categorias.forEach(cat => {
             let option = document.createElement("option");
             option.value = cat;
@@ -166,7 +275,10 @@
         }
 
         try {
-          let response = await fetch(SHEET_API_URL, {
+          // Create URL with credentials for POST request
+          const url = SHEET_API_URL + "?username=" + encodeURIComponent(credentials.username) + "&password=" + encodeURIComponent(credentials.password);
+          
+          let response = await fetch(url, {
             method: "POST",
             redirect: "follow",
             headers: {
@@ -178,6 +290,17 @@
               categoria
             })
           });
+          
+          // Check if unauthorized
+          if (response.status === 401) {
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('appContent').style.display = 'none';
+            showLoginFeedback("Sesión expirada, inicia sesión nuevamente", "error");
+            return;
+          }
+          
           let resultText = await response.text();
           let result = JSON.parse(resultText);
 
@@ -185,7 +308,10 @@
             showFeedback("Gasto agregado correctamente", "success");
             document.getElementById("addButton").style.backgroundColor = "#4CAF50";  /* Green button for success */
             setTimeout(() => {
-              location.reload(); // Reload page after feedback
+              cargarDatos(); // Reload data instead of full page refresh
+              document.getElementById("valor").value = ""; // Clear input field
+              document.getElementById("addButton").style.backgroundColor = "#0066FF"; // Reset button color
+              document.getElementById("addButton").disabled = true; // Disable button
             }, 2000);  // After 2 seconds
           } else {
             showFeedback("Error al agregar gasto", "error");
@@ -214,7 +340,18 @@
         addButton.disabled = !this.value || this.value <= 0;
       });
 
-      cargarDatos();  // Load data when the page loads
+      // Add keyboard event listeners for login form
+      document.getElementById("username").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          document.getElementById("password").focus();
+        }
+      });
+      
+      document.getElementById("password").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
     </script>
   </body>
 </html>

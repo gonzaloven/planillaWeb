@@ -44,7 +44,11 @@
         try {
           // Aquí hacemos la petición GET al nuevo endpoint
           let response = await fetch(SHEET_API_URL + "?action=getData", {
-            redirect: "follow"  // Asegurarse de seguir cualquier redirección
+            redirect: "follow",
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"  // Set correct content type
+            }
           });
           let data = await response.json();
           

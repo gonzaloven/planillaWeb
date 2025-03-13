@@ -39,14 +39,19 @@
     </div>
     <script>
       const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbx-zJ8AejJLWX9EHrca_r3onBMUyG0fMZuSU5H-xFY24-RAXTQLDGOyxn1pK45WYW0t/exec"; // Reemplazar con la URL de tu script
+      
       async function cargarDatos() {
         try {
           // Aquí hacemos la petición GET al nuevo endpoint
-          let response = await fetch(SHEET_API_URL + "?action=getData");
+          let response = await fetch(SHEET_API_URL + "?action=getData", {
+            redirect: "follow"  // Asegurarse de seguir cualquier redirección
+          });
           let data = await response.json();
+          
           // Actualizar los valores en el HTML
           document.getElementById("dolar").textContent = "$" + data.dolar;
           document.getElementById("balance").textContent = "$" + data.balance;
+          
           // Rellenar el select de categorías con las categorías obtenidas
           let categoriaSelect = document.getElementById("categoria");
           data.categorias.forEach(cat => {
@@ -59,6 +64,7 @@
           console.error("Error al cargar datos", error);
         }
       }
+
       async function agregarGasto() {
         let valor = document.getElementById("valor").value;
         let categoria = document.getElementById("categoria").value;
@@ -69,8 +75,9 @@
         try {
           let response = await fetch(SHEET_API_URL, {
             method: "POST",
+            redirect: "follow",  // Asegurarse de seguir cualquier redirección
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json;charset=utf-8"
             },
             body: JSON.stringify({
               action: "addExpense",
@@ -89,7 +96,8 @@
           console.error("Error en la petición", error);
         }
       }
-      cargarDatos();
+
+      cargarDatos();  // Cargar los datos al inicio
     </script>
   </body>
 </html>

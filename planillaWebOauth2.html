@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos</title>
+    <style>
+      /* Dark Mode Styles */
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+        background-color: #181818;  /* Dark background */
+        color: #e1e1e1;  /* Light text */
+      }
+
+      .container {
+        max-width: 400px;
+        margin: auto;
+        background-color: #252525;  /* Slightly lighter background for the container */
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        overflow: hidden;  /* Prevent content from overflowing */
+      }
+
+      input, select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        background-color: #333;  /* Dark background for inputs and buttons */
+        color: #fff;
+        border: 1px solid #444;  /* Slightly lighter border */
+        box-sizing: border-box;  /* Ensures padding doesn't affect width */
+      }
+
+      button {
+        cursor: pointer;
+        background-color: #0066FF;  /* Modern blue button color */
+        border: none;
+        font-weight: bold;
+      }
+
+      button:disabled {
+        background-color: #555;  /* Disabled button with muted color */
+      }
+
+      button:hover {
+        background-color: #0056e0;  /* Slightly darker blue for hover */
+      }
+
+      h2, h3 {
+        color: #00C8FF;  /* Light blue for headings */
+        font-size: 1.6em;  /* Make headings slightly bigger */
+      }
+
+      p {
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+
+      /* Adjusted styles for Precio del Dólar and Balance Total */
+      .price-label {
+        color: #888;  /* Lighter color for labels */
+        font-size: 1.4em;
+      }
+
+      #dolar, #balance {
+        font-size: 2.5em;  /* Increase the font size for the values */
+        font-weight: bold;
+        color: #FFFFFF;  /* White color for balance and dollar */
+      }
+
+      /* Feedback message styles */
+      .feedback-message {
+        display: none;
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #4CAF50;  /* Green background for success */
+        color: white;
+        border-radius: 5px;
+        font-size: 1.2em;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        h2, h3 {
+          font-size: 1.4em;
+        }
+
+        p {
+          font-size: 1.1em;
+        }
+
+        #dolar, #balance {
+          font-size: 2.2em;
+        }
+
+        input, select, button {
+          padding: 10px;
+        }
+      }
+
+      /* Fix the "Monto" input field */
+      input[type="number"] {
+        max-width: 100%; /* Ensure input field doesn't grow too large */
+      }
+    </style>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+      // Reemplaza con tu Client ID de OAuth
+      const CLIENT_ID = '1092242496128-qnvseem4s7645qejqdmahlvbrqsk6h4e.apps.googleusercontent.com';
+
+      // Cargar la librería de la API de Google
+      function cargarLibreriaGoogle() {
+        gapi.load('auth2', function() {
+          console.log("Librería cargada. Inicializando OAuth...");
+          // Inicializar la autenticación con el Client ID y la política de cookies
+          gapi.auth2.init({
+            client_id: CLIENT_ID,
+            cookie_policy: 'none' // Cambié a 'none' para evitar el error de 'Invalid cookiePolicy'
+          }).then(function(auth2) {
+            console.log("OAuth inicializado.");
+            const signInButton = document.getElementById('signin-button');
+            signInButton.style.display = 'block'; // Mostrar el botón para iniciar sesión
+            signInButton.onclick = function() {
+              console.log("Iniciando sesión...");
+              auth2.signIn().then(function(googleUser) {
+                console.log("Usuario autenticado:", googleUser.getBasicProfile().getName());
+                signInButton.style.display = 'none'; // Ocultar botón después del inicio de sesión
+                cargarDatos(); // Cargar los datos después de autenticarse
+              }).catch(function(error) {
+                console.error("Error al iniciar sesión:", error);
+                showFeedback("Hubo un error al iniciar sesión", "error");
+              });
+            };
+          }).catch(function(error) {
+            console.error("Error al inicializar OAuth:", error);
+            showFeedback("Hubo un error al cargar la autenticación", "error");
+          });
+        });
+      }
+
+      // Mostrar mensajes de feedback al usuario
+      function showFeedback(message, type) {
+        const feedbackElement = document.getElementById('feedback');
+        feedbackElement.style.display = 'block';
+        feedbackElement.textContent = message;
+        if (type === "error") {
+          feedbackElement.style.color = 'red';
+        } else {
+          feedbackElement.style.color = 'green';
+        }
+      }
+
+      // Función para cargar los datos una vez el usuario esté autenticado
+      function cargarDatos() {
+        // Aquí iría el código para cargar los datos después de la autenticación
+        console.log("Cargando los datos...");
+      }
+
+      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; 
+
+      // Format number to the style 55.359.101,32
+      function formatNumber(number) {
+        return number.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      async function cargarDatos() {
+        try {
+          let response = await fetch(SHEET_API_URL + "?action=getData", {
+            method: "GET",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            }
+          });
+          let resultText = await response.text();
+          let data = JSON.parse(resultText);
+
+          document.getElementById("dolar").textContent = "$" + formatNumber(data.dolar);
+          document.getElementById("balance").textContent = "$" + formatNumber(data.balance);
+
+          let categoriaSelect = document.getElementById("categoria");
+          data.categorias.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            categoriaSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error al cargar datos", error);
+        }
+      }
+
+      async function agregarGasto() {
+        let valor = document.getElementById("valor").value;
+        let categoria = document.getElementById("categoria").value;
+        if (!valor || !categoria) {
+          showFeedback("Por favor, completa todos los campos", "error");
+          return;
+        }
+
+        try {
+          let response = await fetch(SHEET_API_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+              action: "addExpense",
+              valor,
+              categoria
+            })
+          });
+          let resultText = await response.text();
+          let result = JSON.parse(resultText);
+
+          if (result.success) {
+            showFeedback("Gasto agregado correctamente", "success");
+            document.getElementById("addButton").style.backgroundColor = "#4CAF50";  /* Green button for success */
+            setTimeout(() => {
+              location.reload(); // Reload page after feedback
+            }, 2000);  // After 2 seconds
+          } else {
+            showFeedback("Error al agregar gasto", "error");
+          }
+        } catch (error) {
+          console.error("Error en la petición", error);
+          showFeedback("Hubo un error al procesar la solicitud", "error");
+        }
+      }
+
+      // Show feedback message
+      function showFeedback(message, type) {
+        const feedbackMessage = document.getElementById("feedbackMessage");
+        feedbackMessage.textContent = message;
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.backgroundColor = (type === "success") ? "#4CAF50" : "#f44336";  /* Green for success, red for error */
+        
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";  // Hide after 3 seconds
+        }, 3000);
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        // Enable/disable the add button based on input field
+        document.getElementById("valor").addEventListener("input", function() {
+          const addButton = document.getElementById("addButton");
+          addButton.disabled = !this.value || this.value <= 0;
+        });
+
+        cargarDatos();  // Load data when the page loads
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mis Gastos</h2>
+      <h3>Precio del Dólar</h3>
+      <p id="dolar">Cargando...</p>
+      <h3>Balance Total</h3>
+      <p id="balance">Cargando...</p>
+
+      <h3>Agregar Gasto</h3>
+      <div id="feedbackMessage" class="feedback-message"></div>
+      <input type="number" id="valor" placeholder="Monto" />
+      <select id="categoria">
+        <option value="">Seleccionar categoría</option>
+      </select>
+      <button id="addButton" onclick="agregarGasto()" disabled>Agregar Gasto</button>
+    </div>
+  </body>
+</html>

@@ -10,15 +10,11 @@
         text-align: center;
         margin: 20px;
       }
-
       .container {
         max-width: 400px;
         margin: auto;
       }
-
-      input,
-      select,
-      button {
+      input, select, button {
         width: 100%;
         padding: 10px;
         margin: 5px 0;
@@ -28,35 +24,31 @@
   <body>
     <div class="container">
       <h2>Mis Finanzas</h2>
-      <p>Precio del Dólar: <span id="dolar">Cargando...</span>
-      </p>
-      <p>Balance Total: <span id="balance">Cargando...</span>
-      </p>
+      <p>Precio del Dólar: <span id="dolar">Cargando...</span></p>
+      <p>Balance Total: <span id="balance">Cargando...</span></p>
       <h3>Agregar Gasto</h3>
       <input type="number" id="valor" placeholder="Monto" required>
       <select id="categoria"></select>
       <button onclick="agregarGasto()">Agregar</button>
     </div>
     <script>
-      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; // Reemplazar con la URL de tu script
-      
+      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; // Replace YOUR_ID with your Apps Script ID
+
       async function cargarDatos() {
         try {
-          // Aquí hacemos la petición GET al nuevo endpoint
           let response = await fetch(SHEET_API_URL + "?action=getData", {
-            redirect: "follow",
             method: "GET",
+            redirect: "follow",
             headers: {
-              "Content-Type": "application/json"  // Set correct content type
+              "Content-Type": "text/plain;charset=utf-8"
             }
           });
-          let data = await response.json();
-          
-          // Actualizar los valores en el HTML
+          let resultText = await response.text();
+          let data = JSON.parse(resultText);
+
           document.getElementById("dolar").textContent = "$" + data.dolar;
           document.getElementById("balance").textContent = "$" + data.balance;
-          
-          // Rellenar el select de categorías con las categorías obtenidas
+
           let categoriaSelect = document.getElementById("categoria");
           data.categorias.forEach(cat => {
             let option = document.createElement("option");
@@ -79,9 +71,9 @@
         try {
           let response = await fetch(SHEET_API_URL, {
             method: "POST",
-            redirect: "follow",  // Asegurarse de seguir cualquier redirección
+            redirect: "follow",
             headers: {
-              "Content-Type": "application/json;charset=utf-8"
+              "Content-Type": "text/plain;charset=utf-8"
             },
             body: JSON.stringify({
               action: "addExpense",
@@ -89,8 +81,9 @@
               categoria
             })
           });
-          let result = await response.json();
-          if (result.success) {
+          let resultText = await response.text();
+          let result = JSON.parse(resultText);
+          if (result.status === 200) {
             alert("Gasto agregado correctamente");
             location.reload();
           } else {
@@ -101,7 +94,7 @@
         }
       }
 
-      cargarDatos();  // Cargar los datos al inicio
+      cargarDatos();  // Load data when the page loads
     </script>
   </body>
 </html>

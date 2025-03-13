@@ -83,7 +83,7 @@
           });
           let resultText = await response.text();
           let result = JSON.parse(resultText);
-          if (result.status === 200) {
+          if (result.status === 200 || result.status === 302) {
             alert("Gasto agregado correctamente");
             location.reload();
           } else {

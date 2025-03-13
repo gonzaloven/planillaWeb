@@ -5,34 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Gastos</title>
     <style>
+      /* Dark Mode Styles */
       body {
         font-family: Arial, sans-serif;
         text-align: center;
         margin: 20px;
+        background-color: #181818;  /* Dark background */
+        color: #e1e1e1;  /* Light text */
       }
+
       .container {
         max-width: 400px;
         margin: auto;
+        background-color: #252525;  /* Slightly lighter background for the container */
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        overflow: hidden;  /* Prevent content from overflowing */
       }
+
       input, select, button {
         width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        background-color: #333;  /* Dark background for inputs and buttons */
+        color: #fff;
+        border: 1px solid #444;  /* Slightly lighter border */
+        box-sizing: border-box;  /* Ensures padding doesn't affect width */
+      }
+
+      button {
+        cursor: pointer;
+        background-color: #0066FF;  /* Modern blue button color */
+        border: none;
+        font-weight: bold;
+      }
+
+      button:disabled {
+        background-color: #555;  /* Disabled button with muted color */
+      }
+
+      button:hover {
+        background-color: #0056e0;  /* Slightly darker blue for hover */
+      }
+
+      h2, h3 {
+        color: #00C8FF;  /* Light blue for headings */
+        font-size: 1.6em;  /* Make headings slightly bigger */
+      }
+
+      p {
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+
+      /* Adjusted styles for Precio del Dólar and Balance Total */
+      .price-label {
+        color: #888;  /* Lighter color for labels */
+        font-size: 1.4em;
+      }
+
+      #dolar, #balance {
+        font-size: 2.5em;  /* Increase the font size for the values */
+        font-weight: bold;
+        color: #FFFFFF;  /* White color for balance and dollar */
+      }
+
+      /* Feedback message styles */
+      .feedback-message {
+        display: none;
         padding: 10px;
-        margin: 5px 0;
+        margin-top: 10px;
+        background-color: #4CAF50;  /* Green background for success */
+        color: white;
+        border-radius: 5px;
+        font-size: 1.2em;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        h2, h3 {
+          font-size: 1.4em;
+        }
+
+        p {
+          font-size: 1.1em;
+        }
+
+        #dolar, #balance {
+          font-size: 2.2em;
+        }
+
+        input, select, button {
+          padding: 10px;
+        }
+      }
+
+      /* Fix the "Monto" input field */
+      input[type="number"] {
+        max-width: 100%; /* Ensure input field doesn't grow too large */
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h2>Mis Finanzas</h2>
-      <p>Precio del Dólar: <span id="dolar">Cargando...</span></p>
-      <p>Balance Total: <span id="balance">Cargando...</span></p>
+      <p><span class="price-label">Precio del Dólar:</span> <span id="dolar">Cargando...</span></p>
+      <p><span class="price-label">Balance Total:</span> <span id="balance">Cargando...</span></p>
       <h3>Agregar Gasto</h3>
       <input type="number" id="valor" placeholder="Monto" required>
       <select id="categoria"></select>
-      <button onclick="agregarGasto()">Agregar</button>
+      <button id="addButton" onclick="agregarGasto()" disabled>Agregar</button>
+
+      <!-- Feedback Message -->
+      <div id="feedbackMessage" class="feedback-message"></div>
     </div>
+
     <script>
-      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; // Replace YOUR_ID with your Apps Script ID
+      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; 
+
+      // Format number to the style 55.359.101,32
+      function formatNumber(number) {
+        return number.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
 
       async function cargarDatos() {
         try {
@@ -46,8 +142,8 @@
           let resultText = await response.text();
           let data = JSON.parse(resultText);
 
-          document.getElementById("dolar").textContent = "$" + data.dolar;
-          document.getElementById("balance").textContent = "$" + 10;
+          document.getElementById("dolar").textContent = "$" + formatNumber(data.dolar);
+          document.getElementById("balance").textContent = "$" + 50;
 
           let categoriaSelect = document.getElementById("categoria");
           data.categorias.forEach(cat => {
@@ -65,9 +161,10 @@
         let valor = document.getElementById("valor").value;
         let categoria = document.getElementById("categoria").value;
         if (!valor || !categoria) {
-          alert("Por favor, completa todos los campos");
+          showFeedback("Por favor, completa todos los campos", "error");
           return;
         }
+
         try {
           let response = await fetch(SHEET_API_URL, {
             method: "POST",
@@ -83,16 +180,39 @@
           });
           let resultText = await response.text();
           let result = JSON.parse(resultText);
-          if (result.status === 200) {
-            alert("Gasto agregado correctamente");
-            location.reload();
+
+          if (result.success) {
+            showFeedback("Gasto agregado correctamente", "success");
+            document.getElementById("addButton").style.backgroundColor = "#4CAF50";  /* Green button for success */
+            setTimeout(() => {
+              location.reload(); // Reload page after feedback
+            }, 2000);  // After 2 seconds
           } else {
-            alert("Error al agregar gasto");
+            showFeedback("Error al agregar gasto", "error");
           }
         } catch (error) {
           console.error("Error en la petición", error);
+          showFeedback("Hubo un error al procesar la solicitud", "error");
         }
       }
+
+      // Show feedback message
+      function showFeedback(message, type) {
+        const feedbackMessage = document.getElementById("feedbackMessage");
+        feedbackMessage.textContent = message;
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.backgroundColor = (type === "success") ? "#4CAF50" : "#f44336";  /* Green for success, red for error */
+        
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";  // Hide after 3 seconds
+        }, 3000);
+      }
+
+      // Enable/disable the add button based on input field
+      document.getElementById("valor").addEventListener("input", function() {
+        const addButton = document.getElementById("addButton");
+        addButton.disabled = !this.value || this.value <= 0;
+      });
 
       cargarDatos();  // Load data when the page loads
     </script>

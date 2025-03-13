@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+      }
+      .container {
+        max-width: 400px;
+        margin: auto;
+      }
+      input, select, button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mis Finanzas</h2>
+      <p>Precio del Dólar: <span id="dolar">Cargando...</span></p>
+      <p>Balance Total: <span id="balance">Cargando...</span></p>
+      <h3>Agregar Gasto</h3>
+      <input type="number" id="valor" placeholder="Monto" required>
+      <select id="categoria"></select>
+      <button onclick="agregarGasto()">Agregar</button>
+    </div>
+    <script>
+      const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxn9o1ZFaXvT59MA_pBPhLdHXW0gY1hpXgMMa42zAqrvwbEYmTNAw2vughFtHO7dsz0/exec"; // Replace YOUR_ID with your Apps Script ID
+
+      async function cargarDatos() {
+        try {
+          let response = await fetch(SHEET_API_URL + "?action=getData", {
+            method: "GET",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            }
+          });
+          let resultText = await response.text();
+          let data = JSON.parse(resultText);
+
+          document.getElementById("dolar").textContent = "$" + data.dolar;
+          document.getElementById("balance").textContent = "$" + 10;
+
+          let categoriaSelect = document.getElementById("categoria");
+          data.categorias.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            categoriaSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error al cargar datos", error);
+        }
+      }
+
+      async function agregarGasto() {
+        let valor = document.getElementById("valor").value;
+        let categoria = document.getElementById("categoria").value;
+        if (!valor || !categoria) {
+          alert("Por favor, completa todos los campos");
+          return;
+        }
+        try {
+          let response = await fetch(SHEET_API_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+              action: "addExpense",
+              valor,
+              categoria
+            })
+          });
+          let resultText = await response.text();
+          let result = JSON.parse(resultText);
+          if (result.status === 200) {
+            alert("Gasto agregado correctamente");
+            location.reload();
+          } else {
+            alert("Error al agregar gasto");
+          }
+        } catch (error) {
+          console.error("Error en la petición", error);
+        }
+      }
+
+      cargarDatos();  // Load data when the page loads
+    </script>
+  </body>
+</html>

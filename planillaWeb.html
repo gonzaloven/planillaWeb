@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1A1040">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Finanzas</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -18,7 +16,7 @@
       --r: 16px; --r-sm: 10px; --t: 0.22s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html { height:100%; background:#1A1040; }
+    html { height:100%; background:var(--bg); }
     body { height:100%; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; padding-bottom:env(safe-area-inset-bottom); }
     ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
     #bgGradient {
@@ -75,7 +73,7 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     /* ── MOBILE HEADER ─── */
-    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:calc(56px + env(safe-area-inset-top)); background:rgba(26,16,64,0.75); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border-bottom:1px solid rgba(124,110,250,0.15); align-items:flex-end; justify-content:space-between; padding:0 16px calc(8px); padding-top:env(safe-area-inset-top); }
+    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:calc(56px + env(safe-area-inset-top)); background:rgba(7,7,15,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); align-items:flex-end; justify-content:space-between; padding:0 16px calc(8px); padding-top:env(safe-area-inset-top); }
     .mh-btn { background:none; border:none; color:var(--text2); font-size:1.3rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; transition:all var(--t); }
     .mh-btn:hover { background:rgba(255,255,255,0.07); color:var(--text); }
     .mh-title { font-size:1rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }

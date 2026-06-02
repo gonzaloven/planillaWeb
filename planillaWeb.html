@@ -448,9 +448,6 @@
             </g>
             <circle cx="170" cy="148" r="28" fill="var(--s1)" opacity=".75"/>
             <text id="gaugePct"   x="170" y="155" text-anchor="middle" font-family="Inter,sans-serif" font-size="26" font-weight="800" fill="white">–</text>
-            <text id="gaugeLabel" x="170" y="190" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#9898C0">disponible</text>
-            <text x="36"  y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#FF5A72">0%</text>
-            <text x="304" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#22D397">100%</text>
           </svg>
         </div>
         <div>
@@ -835,7 +832,9 @@ function applyDashData(data) {
   setMasked('balanceARS', fmtARS(balARS));
   setMasked('balanceUSD', '≈ ' + fmtUSD(balUSD));
   document.getElementById('dolarDisplay').textContent = fmtARS(dolar);
-  document.getElementById('dolarSub').textContent = 'Actualizado';
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('dolarSub').textContent = 'Última actualización ' + timeStr;
   if (data.salaryUSD) {
     setMasked('salaryUSD', fmtUSD(data.salaryUSD));
     setMasked('salaryARS', fmtARS(data.salaryUSD * dolar));

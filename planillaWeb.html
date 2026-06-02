@@ -57,12 +57,22 @@
     .page.active { display:flex; flex-direction:column; gap:18px; animation:fadeUp .2s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ── BOTTOM NAV ─── */
-    #bottomNav { display:none; position:fixed; bottom:0; left:0; right:0; z-index:50; background:rgba(14,14,28,0.95); backdrop-filter:blur(20px); border-top:1px solid var(--border); padding:8px 0 max(8px,env(safe-area-inset-bottom)); }
-    .bn-items { display:flex; justify-content:space-around; }
-    .bn-item { display:flex; flex-direction:column; align-items:center; gap:3px; padding:5px 8px; cursor:pointer; font-size:.6rem; font-weight:600; color:var(--text3); transition:color var(--t); }
-    .bn-icon { font-size:1.2rem; }
-    .bn-item.active { color:var(--accent); }
+    /* ── MOBILE HEADER ─── */
+    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:56px; background:rgba(7,7,15,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); align-items:center; justify-content:space-between; padding:0 16px; padding-top:env(safe-area-inset-top); }
+    .mh-btn { background:none; border:none; color:var(--text2); font-size:1.3rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; transition:all var(--t); }
+    .mh-btn:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+    .mh-title { font-size:1rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    /* ── DRAWER ─── */
+    .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:60; backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); }
+    .drawer-overlay.open { display:block; animation:fadeIn .2s ease; }
+    .drawer { position:fixed; top:0; left:0; bottom:0; width:78vw; max-width:300px; z-index:61; background:var(--s1); border-right:1px solid var(--border); transform:translateX(-100%); transition:transform .3s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; padding:max(48px,calc(env(safe-area-inset-top)+12px)) 16px 24px; }
+    .drawer.open { transform:translateX(0); }
+    .drawer-logo { font-size:1.3rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; padding:0 10px; margin-bottom:28px; }
+    .drawer-item { display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:12px; cursor:pointer; font-size:.95rem; font-weight:500; color:var(--text2); transition:all var(--t); user-select:none; }
+    .drawer-item:hover { color:var(--text); background:rgba(255,255,255,0.05); }
+    .drawer-item.active { color:var(--accent); background:rgba(124,110,250,0.1); font-weight:600; }
+    .drawer-sep { height:1px; background:var(--border); margin:10px 0; }
+    .drawer-bottom { margin-top:auto; }
 
     /* ── CARDS ─── */
     .card { background:var(--s1); border:1px solid var(--border); border-radius:var(--r); padding:20px; }
@@ -256,12 +266,17 @@
 
     /* ── RESPONSIVE ─── */
     @media (max-width:768px) {
-      #sidebar { display:none; } #bottomNav { display:block; } .fab { bottom:calc(80px + env(safe-area-inset-bottom)); right:16px; }
-      .page { padding:16px 16px calc(78px + env(safe-area-inset-bottom)); }
-      .balance-ars { font-size:2.2rem; }
+      #sidebar { display:none; }
+      #mobileHeader { display:flex; }
+      .fab { bottom:calc(24px + env(safe-area-inset-bottom)); right:16px; }
+      .page { padding:calc(56px + env(safe-area-inset-top) + 16px) 16px calc(32px + env(safe-area-inset-bottom)); }
+      .balance-ars { font-size:1.9rem; letter-spacing:-1px; }
+      .balance-usd { font-size:.82rem; }
       .cat-desktop-grid { display:none !important; } .wheel-outer { display:block; }
-      #toast { bottom:calc(72px + env(safe-area-inset-bottom) + 12px); }
+      #toast { bottom:calc(24px + env(safe-area-inset-bottom) + 12px); }
       .modal-sheet { border-radius:24px 24px 0 0; }
+      .balance-card { padding:20px 18px 18px; }
+      .gauge-svg { max-width:280px; }
     }
     @media (min-width:769px) {
       .page { padding:28px 32px; }
@@ -563,14 +578,29 @@
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<nav id="bottomNav">
-  <div class="bn-items">
-    <div class="bn-item active" data-page="home"      onclick="navigate('home')"><span class="bn-icon">⬡</span>Inicio</div>
-    <div class="bn-item"       data-page="add"        onclick="navigate('add')"><span class="bn-icon">＋</span>Agregar</div>
-    <div class="bn-item"       data-page="analytics"  onclick="navigate('analytics')"><span class="bn-icon">◎</span>Análisis</div>
-    <div class="bn-item"       data-page="history"    onclick="navigate('history')"><span class="bn-icon">⊟</span>Historial</div>
-    <div class="bn-item"       data-page="annual"     onclick="navigate('annual')"><span class="bn-icon">◑</span>Anual</div>
+<!-- MOBILE HEADER -->
+<header id="mobileHeader">
+  <button class="mh-btn" onclick="openDrawer()" aria-label="Menú">☰</button>
+  <div class="mh-title">Finanzas</div>
+  <button class="mh-btn" id="mobileRefreshBtn" onclick="mobileRefresh()" aria-label="Actualizar"><span class="ri">↻</span></button>
+</header>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">Finanzas</div>
+  <div class="drawer-item active" data-page="home"      onclick="drawerNavigate('home')">      <span>⬡</span> Inicio</div>
+  <div class="drawer-item"        data-page="add"       onclick="drawerNavigate('add')">       <span>+</span> Agregar</div>
+  <div class="drawer-item"        data-page="analytics" onclick="drawerNavigate('analytics')"> <span>◎</span> Análisis</div>
+  <div class="drawer-item"        data-page="stats"     onclick="drawerNavigate('stats')">     <span>≡</span> Estadísticas</div>
+  <div class="drawer-item"        data-page="history"   onclick="drawerNavigate('history')">   <span>⊟</span> Historial</div>
+  <div class="drawer-item"        data-page="annual"    onclick="drawerNavigate('annual')">    <span>◑</span> Anual</div>
+  <div class="drawer-item"        data-page="portfolio" onclick="drawerNavigate('portfolio')"> <span>◈</span> Portafolio</div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-bottom">
+    <div class="drawer-item" onclick="logout()" style="color:var(--red)"><span>↩</span> Cerrar sesión</div>
   </div>
 </nav>
 
@@ -628,8 +658,8 @@ function showToast(msg, type='') {
 
 async function apiFetch(params, method='GET', body=null) {
   const url = CFG.API + '?' + new URLSearchParams({...params, username:S.creds.u, password:S.creds.p});
-  const opts = { method, redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'} };
-  if (body) opts.body = JSON.stringify(body);
+  const opts = { method, redirect:'follow' };
+  if (body) { opts.headers = {'Content-Type':'text/plain;charset=utf-8'}; opts.body = JSON.stringify(body); }
   const r = await fetch(url, opts);
   if (r.status === 401) { logout(); throw new Error('401'); }
   return r.json();
@@ -725,10 +755,34 @@ function logout() {
   const btn = document.getElementById('loginBtn'); btn.textContent = 'Ingresar'; btn.disabled = false;
 }
 
+// ═══ DRAWER ═══
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function drawerNavigate(page) {
+  closeDrawer();
+  navigate(page);
+  document.querySelectorAll('.drawer-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+}
+function mobileRefresh() {
+  const btn = document.getElementById('mobileRefreshBtn');
+  btn.classList.add('spinning');
+  showSkeletons();
+  Promise.all([loadDashboard(), loadHistory()]).finally(() => btn.classList.remove('spinning'));
+}
+
 // ═══ NAVIGATION ═══
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  document.querySelectorAll('.drawer-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
   document.getElementById('page-' + page).classList.add('active');
   S.currentPage = page;
   if (page === 'analytics') renderAnalytics();

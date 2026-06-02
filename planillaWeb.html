@@ -18,8 +18,8 @@
       --r: 16px; --r-sm: 10px; --t: 0.22s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html { height:100%; height:-webkit-fill-available; background:var(--bg); }
-    body { height:100%; height:-webkit-fill-available; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+    html { height:100%; background:var(--bg); }
+    body { height:100%; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
     ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
     body::before {
       content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -27,6 +27,8 @@
         radial-gradient(ellipse 60% 40% at 10% 20%, rgba(124,110,250,0.12) 0%, transparent 60%),
         radial-gradient(ellipse 40% 50% at 90% 80%, rgba(0,201,167,0.08) 0%, transparent 60%);
     }
+    /* fills safe-area at bottom so no black gap */
+    body::after { content:''; position:fixed; bottom:0; left:0; right:0; height:env(safe-area-inset-bottom); background:var(--bg); z-index:0; pointer-events:none; }
     #loginScreen, #app { position:relative; z-index:1; }
 
     /* ── LOGIN ─── */
@@ -56,7 +58,7 @@
     .logout-btn { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:10px; cursor:pointer; font-size:.83rem; color:var(--text3); transition:all var(--t); }
     .logout-btn:hover { color:var(--red); background:rgba(255,90,114,0.07); }
     #main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-    .page { display:none; flex:1; overflow-y:auto; overflow-x:hidden; padding:24px; }
+    .page { display:none; flex:1; overflow-y:auto; overflow-x:hidden; padding:24px; -webkit-overflow-scrolling:touch; }
     .page.active { display:flex; flex-direction:column; gap:18px; animation:fadeUp .2s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
@@ -93,7 +95,7 @@
     /* ── BALANCE CARD ─── */
     .balance-card { background:linear-gradient(135deg,#16163A 0%,#0E0E20 60%,#0A1A24 100%); border:1px solid rgba(124,110,250,0.2); padding:28px 24px 22px; position:relative; overflow:visible; }
     .balance-card::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle,rgba(124,110,250,0.15) 0%,transparent 70%); pointer-events:none; overflow:hidden; }
-    .balance-ars { font-size:clamp(1.5rem,7.5vw,2.8rem); font-weight:800; letter-spacing:-1.5px; line-height:1.1; margin-bottom:6px; word-break:break-all; }
+    .balance-ars { font-size:clamp(1.1rem,5.5vw,2.8rem); font-weight:800; letter-spacing:-1px; line-height:1.1; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .balance-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .balance-label { font-size:.7rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.7px; }
     .balance-actions { display:flex; gap:8px; align-items:center; }

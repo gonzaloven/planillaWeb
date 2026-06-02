@@ -653,6 +653,7 @@ const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Ago
 const MASK = '••••••••';
 const PAGE_SIZE = 30;
 const CACHE_KEY = 'fn_cache';
+const CACHE_VER = 3;
 
 const S = {
   creds: {u:'',p:''}, hidden:false, entryType:'expense', selectedCat:'',
@@ -686,15 +687,24 @@ async function apiFetch(params, method='GET', body=null) {
 
 // ═══ CACHE ═══
 function saveCache(dash, tx) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify({dash, tx, ts: Date.now()})); } catch {}
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({v:CACHE_VER, dash, tx, ts:Date.now()})); } catch {}
 }
 function loadCache() {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { return null; }
+  try {
+    const d = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (!d || d.v !== CACHE_VER) { localStorage.removeItem(CACHE_KEY); return null; }
+    return d;
+  } catch { localStorage.removeItem(CACHE_KEY); return null; }
 }
 function applyCache(cache) {
   if (!cache) return;
-  if (cache.dash) { S.dashData = cache.dash; applyDashData(cache.dash); }
-  if (cache.tx)   { S.allTx = cache.tx; applyFilters(); }
+  try {
+    if (cache.dash) { S.dashData = cache.dash; applyDashData(cache.dash); }
+    if (cache.tx)   { S.allTx = cache.tx; applyFilters(); }
+  } catch(e) {
+    console.warn('Cache apply failed, clearing:', e);
+    localStorage.removeItem(CACHE_KEY);
+  }
   if (S.currentPage === 'analytics') renderAnalytics();
   if (S.currentPage === 'stats')     renderStats();
   if (S.currentPage === 'annual')    renderAnnual();
@@ -760,8 +770,10 @@ function launchApp() {
   document.getElementById('app').classList.add('visible');
   document.querySelector('.fab').style.display = 'flex';
   // Show cached data immediately, then fetch fresh
-  const cache = loadCache();
-  if (cache) { applyCache(cache); } else { showSkeletons(); }
+  try {
+    const cache = loadCache();
+    if (cache) { applyCache(cache); } else { showSkeletons(); }
+  } catch(e) { localStorage.removeItem(CACHE_KEY); showSkeletons(); }
   loadDashboard();
   loadHistory();
 }

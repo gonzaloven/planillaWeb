@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#07070F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Finanzas</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -15,8 +18,8 @@
       --r: 16px; --r-sm: 10px; --t: 0.22s cubic-bezier(0.4,0,0.2,1);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; overflow:hidden; }
-    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+    html { height:100%; height:-webkit-fill-available; background:var(--bg); }
+    body { height:100%; height:-webkit-fill-available; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
     ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
     body::before {
       content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -88,8 +91,9 @@
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
     /* ── BALANCE CARD ─── */
-    .balance-card { background:linear-gradient(135deg,#16163A 0%,#0E0E20 60%,#0A1A24 100%); border:1px solid rgba(124,110,250,0.2); padding:28px 24px 22px; position:relative; overflow:hidden; }
-    .balance-card::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle,rgba(124,110,250,0.15) 0%,transparent 70%); pointer-events:none; }
+    .balance-card { background:linear-gradient(135deg,#16163A 0%,#0E0E20 60%,#0A1A24 100%); border:1px solid rgba(124,110,250,0.2); padding:28px 24px 22px; position:relative; overflow:visible; }
+    .balance-card::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle,rgba(124,110,250,0.15) 0%,transparent 70%); pointer-events:none; overflow:hidden; }
+    .balance-ars { font-size:clamp(1.5rem,7.5vw,2.8rem); font-weight:800; letter-spacing:-1.5px; line-height:1.1; margin-bottom:6px; word-break:break-all; }
     .balance-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .balance-label { font-size:.7rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.7px; }
     .balance-actions { display:flex; gap:8px; align-items:center; }
@@ -270,7 +274,6 @@
       #mobileHeader { display:flex; }
       .fab { bottom:calc(24px + env(safe-area-inset-bottom)); right:16px; }
       .page { padding:calc(56px + env(safe-area-inset-top) + 16px) 16px calc(32px + env(safe-area-inset-bottom)); }
-      .balance-ars { font-size:1.9rem; letter-spacing:-1px; }
       .balance-usd { font-size:.82rem; }
       .cat-desktop-grid { display:none !important; } .wheel-outer { display:block; }
       #toast { bottom:calc(24px + env(safe-area-inset-bottom) + 12px); }

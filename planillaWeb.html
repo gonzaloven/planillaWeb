@@ -24,11 +24,10 @@
     body::before {
       content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
       background:
-        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(124,110,250,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 50% at 90% 80%, rgba(0,201,167,0.08) 0%, transparent 60%);
+        radial-gradient(ellipse 70% 50% at 0% 0%,   rgba(124,110,250,0.28) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0,201,167,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(90,79,214,0.10)  0%, transparent 65%);
     }
-    /* fills safe-area at bottom so no black gap */
-    body::after { content:''; position:fixed; bottom:0; left:0; right:0; height:env(safe-area-inset-bottom); background:var(--bg); z-index:0; pointer-events:none; }
     #loginScreen, #app { position:relative; z-index:1; }
 
     /* ── LOGIN ─── */
@@ -63,14 +62,14 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     /* ── MOBILE HEADER ─── */
-    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:56px; background:rgba(7,7,15,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); align-items:center; justify-content:space-between; padding:0 16px; padding-top:env(safe-area-inset-top); }
+    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:calc(56px + env(safe-area-inset-top)); background:rgba(7,7,15,0.6); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%); border-bottom:1px solid rgba(255,255,255,0.06); align-items:flex-end; justify-content:space-between; padding:0 16px calc(8px); padding-top:env(safe-area-inset-top); }
     .mh-btn { background:none; border:none; color:var(--text2); font-size:1.3rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; transition:all var(--t); }
     .mh-btn:hover { background:rgba(255,255,255,0.07); color:var(--text); }
     .mh-title { font-size:1rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     /* ── DRAWER ─── */
     .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:60; backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); }
     .drawer-overlay.open { display:block; animation:fadeIn .2s ease; }
-    .drawer { position:fixed; top:0; left:0; bottom:0; width:78vw; max-width:300px; z-index:61; background:var(--s1); border-right:1px solid var(--border); transform:translateX(-100%); transition:transform .3s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; padding:max(48px,calc(env(safe-area-inset-top)+12px)) 16px 24px; }
+    .drawer { position:fixed; top:0; left:0; bottom:0; width:78vw; max-width:300px; z-index:61; background:rgba(10,10,22,0.75); backdrop-filter:blur(28px) saturate(160%); -webkit-backdrop-filter:blur(28px) saturate(160%); border-right:1px solid rgba(255,255,255,0.07); transform:translateX(-100%); transition:transform .3s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; padding:max(48px,calc(env(safe-area-inset-top)+12px)) 16px max(24px,calc(env(safe-area-inset-bottom)+16px)); }
     .drawer.open { transform:translateX(0); }
     .drawer-logo { font-size:1.3rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; padding:0 10px; margin-bottom:28px; }
     .drawer-item { display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:12px; cursor:pointer; font-size:.95rem; font-weight:500; color:var(--text2); transition:all var(--t); user-select:none; }

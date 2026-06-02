@@ -105,7 +105,7 @@
     /* ── BALANCE CARD ─── */
     .balance-card { background:linear-gradient(135deg,#16163A 0%,#0E0E20 60%,#0A1A24 100%); border:1px solid rgba(124,110,250,0.2); padding:28px 24px 22px; position:relative; overflow:visible; }
     .balance-card::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle,rgba(124,110,250,0.15) 0%,transparent 70%); pointer-events:none; overflow:hidden; }
-    .balance-ars { font-size:clamp(1.1rem,5.5vw,2.8rem); font-weight:800; letter-spacing:-1px; line-height:1.1; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .balance-ars { font-size:clamp(1.1rem,5.5vw,2.8rem); font-weight:800; letter-spacing:-1px; line-height:1.1; margin-bottom:6px; }
     .balance-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .balance-label { font-size:.7rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.7px; }
     .balance-actions { display:flex; gap:8px; align-items:center; }
@@ -846,8 +846,8 @@ function applyDashData(data) {
   const dolar  = parseFloat(data.dolar)   || 1;
   const balARS = parseFloat(data.balance) || 0;
   const balUSD = balARS / dolar;
-  setMasked('balanceARS', fmtARS(balARS));
-  setMasked('balanceUSD', '≈ ' + fmtUSD(balUSD));
+  setMasked('balanceARS', '$ ' + Math.round(balARS).toLocaleString('es-AR'));
+  setMasked('balanceUSD', '≈ USD ' + Math.round(balUSD).toLocaleString('en-US'));
   document.getElementById('dolarDisplay').textContent = fmtARS(dolar);
   const now = new Date();
   const timeStr = now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});

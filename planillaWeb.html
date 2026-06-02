@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Finanzas</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
     #lgBottom {
       position:fixed; bottom:0; left:0; right:0;
       height:calc(env(safe-area-inset-bottom) + 4px); min-height:4px;
-      background:rgba(0,168,138,0.08);
+      background:rgba(18,10,45,0.9);
       z-index:-1; pointer-events:none;
     }
     #loginScreen, #app { position:relative; z-index:1; height:100%; }
@@ -73,7 +73,7 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     /* ── MOBILE HEADER ─── */
-    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:calc(56px + env(safe-area-inset-top)); background:rgba(7,7,15,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); align-items:flex-end; justify-content:space-between; padding:0 16px calc(8px); padding-top:env(safe-area-inset-top); }
+    #mobileHeader { display:none; position:fixed; top:0; left:0; right:0; z-index:50; height:calc(56px + env(safe-area-inset-top)); background:rgba(18,10,45,0.9); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(124,110,250,0.12); align-items:flex-end; justify-content:space-between; padding:0 16px calc(8px); padding-top:env(safe-area-inset-top); }
     .mh-btn { background:none; border:none; color:var(--text2); font-size:1.3rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; transition:all var(--t); }
     .mh-btn:hover { background:rgba(255,255,255,0.07); color:var(--text); }
     .mh-title { font-size:1rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }

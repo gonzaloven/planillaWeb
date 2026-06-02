@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#07070F">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Finanzas</title>
@@ -21,12 +20,25 @@
     html { height:100%; background:var(--bg); }
     body { height:100%; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
     ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-    body::before {
-      content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    #bgGradient {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
       background:
-        radial-gradient(ellipse 70% 50% at 0% 0%,   rgba(124,110,250,0.28) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0,201,167,0.18) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(90,79,214,0.10)  0%, transparent 65%);
+        radial-gradient(ellipse 70% 50% at 0% 0%,    rgba(124,110,250,0.28) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0,201,167,0.18)  0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%,   rgba(90,79,214,0.10)  0%, transparent 65%);
+    }
+    /* iOS 26 Liquid Glass tinting strips — sampled by Safari at screen edges */
+    #lgTop {
+      position:fixed; top:0; left:0; right:0;
+      height:calc(env(safe-area-inset-top) + 2px); min-height:4px;
+      background:rgba(105,88,240,0.45);
+      z-index:998; pointer-events:none;
+    }
+    #lgBottom {
+      position:fixed; bottom:-2px; left:0; right:0;
+      height:calc(env(safe-area-inset-bottom) + 6px); min-height:6px;
+      background:rgba(0,168,138,0.4);
+      z-index:998; pointer-events:none;
     }
     #loginScreen, #app { position:relative; z-index:1; }
 
@@ -292,6 +304,9 @@
   </style>
 </head>
 <body>
+<div id="bgGradient" aria-hidden="true"></div>
+<div id="lgTop"    aria-hidden="true"></div>
+<div id="lgBottom" aria-hidden="true"></div>
 
 <!-- LOGIN -->
 <div id="loginScreen">

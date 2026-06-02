@@ -316,7 +316,7 @@
   <div class="login-card">
     <div class="login-logo">Finanzas</div>
     <div class="login-sub">Panel financiero personal</div>
-    <div class="ig"><label>Usuario</label><input type="text" id="loginUser" placeholder="gonzaloven" autocomplete="username"></div>
+    <div class="ig"><label>Usuario</label><input type="text" id="loginUser" placeholder="Usuario" autocomplete="username"></div>
     <div class="ig"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="loginBtn" onclick="doLogin()">Ingresar</button>
     <div id="loginError"></div>
@@ -1506,7 +1506,7 @@ class WheelPicker {
   _start(e){this.drag=true;this.vel=0;this.startY=this._getY(e);this.startOff=this.offset;this.lastY=this.startY;this.lastT=Date.now();}
   _move(e){if(!this.drag)return;if(e.cancelable)e.preventDefault();const y=this._getY(e),now=Date.now();this.vel=(y-this.lastY)/Math.max(now-this.lastT,1)*16;this.lastY=y;this.lastT=now;this._setOffset(this.startOff+(y-this.startY),false);this._updateClasses();}
   _end(){if(!this.drag)return;this.drag=false;const target=this.offset+this.vel*5;const snap=Math.round(-target/this.ITEM_H);this.select(Math.max(0,Math.min(this.items.length-1,snap)));}
-  _setOffset(off,animate=true){const min=-(this.items.length-1)*this.ITEM_H;off=Math.max(min,Math.min(0,off));this.offset=off;this.el.style.transition=animate?'transform .32s cubic-bezier(0.4,0,0.2,1)':'none';this.el.style.transform=`translateY(${off+this.PAD*this.ITEM_H}px)`;}
+  _setOffset(off,animate=true){const min=-(this.items.length-1)*this.ITEM_H;off=Math.max(min,Math.min(0,off));this.offset=off;this.el.style.transition=animate?'transform .32s cubic-bezier(0.4,0,0.2,1)':'none';this.el.style.transform=`translateY(${off}px)`;}
   _updateClasses(){const cur=Math.round(-this.offset/this.ITEM_H);this.el.querySelectorAll('.wheel-item[data-i]').forEach(el=>{const i=parseInt(el.dataset.i),d=Math.abs(i-cur);el.classList.toggle('w-active',d===0);el.classList.toggle('w-near1',d===1);el.classList.toggle('w-near2',d===2);});}
   select(idx,silent=false){this.idx=idx;this._setOffset(-idx*this.ITEM_H);this._updateClasses();if(!silent&&this.onChange)this.onChange(this.items[idx],idx);}
   getValue(){return this.items[this.idx];}

@@ -741,6 +741,12 @@ function toggleBalance() {
 
 // ═══ AUTH ═══
 window.onload = () => {
+  // ?reset=1 in URL clears all local data and forces fresh login
+  if (new URLSearchParams(location.search).get('reset') === '1') {
+    localStorage.clear();
+    location.replace(location.pathname);
+    return;
+  }
   const u = localStorage.getItem('fn_u'), p = localStorage.getItem('fn_p');
   if (u && p) { S.creds = {u,p}; launchApp(); }
   document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });

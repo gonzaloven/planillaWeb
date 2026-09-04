@@ -1488,7 +1488,7 @@ async function apiFetch(params, method='GET', body=null) {
   if (body) { opts.headers = {'Content-Type':'text/plain;charset=utf-8'}; opts.body = JSON.stringify(body); }
   const r = await fetch(url, opts);
   const data = await r.json();
-  if (isAuthError(data)) { logout(); throw new Error('401'); }
+  if (isAuthError(data)) { logout('Tu sesión expiró. Ingresá de nuevo.'); throw new Error('401'); }
   return data;
 }
 
@@ -1576,17 +1576,22 @@ window.onload = () => {
   }
   const u = localStorage.getItem('fn_u'), p = localStorage.getItem('fn_p');
   if (u && p) {
-    // Antes esto corria en silencio: veias el formulario, escribias, y de golpe
-    // entrabas solo. Ahora dice que esta pasando y no te deja escribir al pedo.
-    authEnCurso = true;
-    loginOcupado(true, 'Verificando tu sesión...');
-    verifyCreds(u, p)
-      .then(ok => {
-        authEnCurso = false;
-        if (ok) { S.creds = {u,p}; launchApp(); }
-        else loginFailed('Tu sesión expiró. Ingresá de nuevo.');
-      })
-      .catch(() => { authEnCurso = false; loginFailed('No se pudo conectar. Revisá tu conexión.', true); });
+    // Se entra directo con las credenciales guardadas, sin esperar a revalidar.
+    //
+    // Antes el arranque llamaba a verifyCreds y recien mostraba la app cuando
+    // contestaba: en Apps Script eso son ~2s en caliente y hasta 20s en frio
+    // (medido), asi que cada F5 se quedaba en "Verificando tu sesion". Y encima
+    // era al dope: verifyCreds pide `getData` y tira el resultado, y despues
+    // launchApp vuelve a pedir el MISMO endpoint desde loadDashboard. Dos veces
+    // la llamada mas cara para no mostrar nada mientras.
+    //
+    // Se sigue validando en cada carga, pero con la primera llamada de datos:
+    // apiFetch detecta el error de auth y desloguea sola. La contra es ver la
+    // app un instante antes de que te saque, y es preferible a esperar siempre.
+    // Nada de esto toca el candado: si hay credenciales guardadas el formulario
+    // ni se muestra, asi que no hay nada que pisar.
+    S.creds = {u,p};
+    launchApp();
   }
   document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter' && !authEnCurso) doLogin(); });
   document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
@@ -1668,7 +1673,10 @@ function launchApp() {
   fetchSettings().then(ok => { if (ok) cascada(); });
 }
 
-function logout() {
+// `msg` lo usa el deslogueo automatico: ahora que se entra sin revalidar, la
+// sesion vencida se descubre con la primera llamada de datos y hay que decir por
+// que volviste al formulario, o parece que la app te escupio sola.
+function logout(msg) {
   localStorage.removeItem('fn_u'); localStorage.removeItem('fn_p');
   S.creds = {u:'',p:''}; S.allTx = []; S.dashData = null;
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1676,7 +1684,7 @@ function logout() {
   document.querySelector('.fab').style.display = 'none';
   ['loginUser','loginPass'].forEach(id => document.getElementById(id).value = '');
   authEnCurso = false;
-  loginOcupado(false, '');
+  loginOcupado(false, msg || '');
 }
 
 function mobileRefresh() {

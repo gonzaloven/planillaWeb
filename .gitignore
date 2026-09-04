@@ -1,0 +1,11 @@
+# Contexto de trabajo con datos financieros reales (sueldo, patrimonio).
+# El repo es publico: no commitear.
+CLAUDE.md
+ROADMAP.md
+
+# Datos exportados y scripts de analisis
+_data/
+BACKLOG.md
+
+# Version vieja del backend, superada
+appscript_v1_old.txt
